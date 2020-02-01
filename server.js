@@ -36,3 +36,18 @@ const getRavel = async () => {
 }
 
 getRavel().then((ravel) => console.log(ravel))
+
+const getAmstelHome = async () => {
+  const fetched = await fetch('http://roomselector.studentexperience.nl/index.php?language=en')
+  const body = await fetched.text()
+  const $ = cheerio.load(body)
+  const availabilities = []
+  const grounds = $('.home_available_element')
+  grounds.each((index, object) => {
+    console.log($(object).html())
+    availabilities.push($(object).text().replace(/(\r\n|\n|\r)/gm, '').trim().indexOf('No appartment'))
+  })
+  return availabilities
+}
+
+getAmstelHome().then((amstelHome) => console.log(amstelHome))
