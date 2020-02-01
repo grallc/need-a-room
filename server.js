@@ -8,19 +8,34 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const token = process.env.TELEGRAM_TOKEN
-const channel = process.env.CHANNEL
+const defaultChannel = process.env.CHANNEL_ID
 
 if (!token) {
   throw new Error('Missing Telegram Token. Please provid a valid in .env file.')
 }
 
-const bot = new TelegramBot(token)
-bot.sendMessage(channel, "I'm still here and looking for an appartment!")
+const bot = new TelegramBot(token, { polling: true })
+
+const sendAvailabilities = async (chatId = defaultChannel) => {
+  const message = await bot.sendMessage(chatId, 'Fetching availabilities...')
+  const messageId = message.message_id
+  const ravel = await getRavel()
+  const amstelHome = await getAmstelHome()
+  const messageContent =
+    '🏢   *Student Experience - AmstelHome*' +
+    `\n▪ ${amstelHome.reduce((a, b) => a + b, 0)} appartment(s) available` +
+    '\n\n🏢   *Student Experience - Ravel Residence*' +
+    `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available`
+  bot.editMessageText(messageContent, { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
+  setTimeout(sendAvailabilities, 3600000)
+}
+
+sendAvailabilities()
 
 // Matches "/av"
-bot.onText(/\/av/, (msg) => {
+bot.onText(/\/av/, async (msg) => {
   const chatId = msg.chat.id
-  bot.sendMessage(chatId, 'Fetching availability...')
+  sendAvailabilities(chatId)
 })
 
 const getRavel = async () => {
@@ -35,8 +50,6 @@ const getRavel = async () => {
   return availabilities
 }
 
-getRavel().then((ravel) => console.log(ravel))
-
 const getAmstelHome = async () => {
   const fetched = await fetch('http://roomselector.studentexperience.nl/index.php?language=en')
   const body = await fetched.text()
@@ -44,10 +57,7 @@ const getAmstelHome = async () => {
   const availabilities = []
   const grounds = $('.home_available_element')
   grounds.each((index, object) => {
-    console.log($(object).html())
     availabilities.push($(object).text().replace(/(\r\n|\n|\r)/gm, '').trim().indexOf('No appartment'))
   })
   return availabilities
 }
-
-getAmstelHome().then((amstelHome) => console.log(amstelHome))
