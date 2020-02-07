@@ -27,7 +27,7 @@ const sendAvailabilities = async (chatId = defaultChannel) => {
     '\n\n🏢   *Student Experience - Ravel Residence*' +
     `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available`
   bot.editMessageText(messageContent, { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
-  setTimeout(sendAvailabilities, 3600000)
+  setTimeout(sendAvailabilities, 3600 * 1000)
 }
 
 sendAvailabilities()
