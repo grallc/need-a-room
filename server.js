@@ -21,16 +21,23 @@ const sendAvailabilities = async (chatId = defaultChannel) => {
   const messageId = message.message_id
   const ravel = await getRavel()
   const amstelHome = await getAmstelHome()
+  const fizz = await getTheFizz()
   const messageContent =
     '🏢   *Student Experience - AmstelHome*' +
     `\n▪ ${amstelHome.reduce((a, b) => a + b, 0)} appartment(s) available` +
     '\n\n🏢   *Student Experience - Ravel Residence*' +
-    `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available`
+    `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available` +
+    '\n\n🏢   *The Fizz*' +
+    `\n▪ ${fizz ? 'Some' : '0'} appartment(s) available`
   bot.editMessageText(messageContent, { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
-  setTimeout(sendAvailabilities, 3600 * 1000)
 }
 
-sendAvailabilities()
+const startAutoMessages = () => {
+  sendAvailabilities()
+  setTimeout(sendAvailabilities, 60 * 60 * 1000)
+}
+
+startAutoMessages()
 
 // Matches "/av"
 bot.onText(/\/av/, async (msg) => {
@@ -60,4 +67,11 @@ const getAmstelHome = async () => {
     availabilities.push($(object).text().replace(/(\r\n|\n|\r)/gm, '').trim().indexOf('No appartment'))
   })
   return availabilities
+}
+
+const getTheFizz = async () => {
+  const fetched = await fetch('https://www.the-fizz.nl/store/c3/Apartments.html')
+  const body = await fetched.text()
+  const $ = cheerio.load(body)
+  return $($('.paragraph')[0]).text().indexOf("We don't have") === -1
 }
