@@ -16,20 +16,22 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true })
 
-const sendAvailabilities = async (chatId = defaultChannel) => {
+const sendAvailabilities = async (chatId = defaultChannel, shouldForce = false) => {
+  const day = new Date().getDay()
+  if (day > 4 && !shouldForce) return
   const message = await bot.sendMessage(chatId, 'Fetching availabilities...')
   const messageId = message.message_id
   const ravel = await getRavel()
   const amstelHome = await getAmstelHome()
   const fizz = await getTheFizz()
   const messageContent =
-    '🏢   [*Student Experience - AmstelHome*](http://roomselector.studentexperience.nl/index.php?language=en)' +
+    '🏢   [Student Experience - AmstelHome](http://roomselector.studentexperience.nl/index.php?language=en)' +
     `\n▪ ${amstelHome.reduce((a, b) => a + b, 0)} appartment(s) available` +
-    '\n\n🏢   [*Student Experience - Ravel Residence*](http://ravelresidence.studentexperience.nl/?language=en)' +
+    '\n\n🏢   [Student Experience - Ravel Residence](http://ravelresidence.studentexperience.nl/?language=en)' +
     `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available` +
-    '\n\n🏢   [*The Fizz*](https://www.the-fizz.nl/store/c3/Apartments.html)' +
+    '\n\n🏢   [The Fizz](https://www.the-fizz.nl/store/c3/Apartments.html)' +
     `\n▪ ${fizz ? 'Some' : '0'} appartment(s) available`
-  bot.editMessageText(messageContent, { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
+  bot.editMessageText(messageContent + '\n\n*Please notice that the availabilities will not be updated today, since were are not in a working day.*', { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
 }
 
 const startAutoMessages = () => {
@@ -42,7 +44,7 @@ startAutoMessages()
 // Matches "/av"
 bot.onText(/\/av/, async (msg) => {
   const chatId = msg.chat.id
-  sendAvailabilities(chatId)
+  sendAvailabilities(chatId, true)
 })
 
 const getRavel = async () => {
