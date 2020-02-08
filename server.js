@@ -23,11 +23,11 @@ const sendAvailabilities = async (chatId = defaultChannel) => {
   const amstelHome = await getAmstelHome()
   const fizz = await getTheFizz()
   const messageContent =
-    '🏢   *Student Experience - AmstelHome*' +
+    '🏢   [*Student Experience - AmstelHome*](http://roomselector.studentexperience.nl/index.php?language=en)' +
     `\n▪ ${amstelHome.reduce((a, b) => a + b, 0)} appartment(s) available` +
-    '\n\n🏢   *Student Experience - Ravel Residence*' +
+    '\n\n🏢   [*Student Experience - Ravel Residence*](http://ravelresidence.studentexperience.nl/?language=en)' +
     `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available` +
-    '\n\n🏢   *The Fizz*' +
+    '\n\n🏢   [*The Fizz*](https://www.the-fizz.nl/store/c3/Apartments.html)' +
     `\n▪ ${fizz ? 'Some' : '0'} appartment(s) available`
   bot.editMessageText(messageContent, { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
 }
