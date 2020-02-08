@@ -31,7 +31,7 @@ const sendAvailabilities = async (chatId = defaultChannel, shouldForce = false) 
     `\n▪ ${ravel.reduce((a, b) => a + b, 0)} appartment(s) available` +
     '\n\n🏢   [The Fizz](https://www.the-fizz.nl/store/c3/Apartments.html)' +
     `\n▪ ${fizz ? 'Some' : '0'} appartment(s) available`
-  bot.editMessageText(messageContent + '\n\n*Please notice that the availabilities will not be updated today, since were are not in a working day.*', { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
+  bot.editMessageText(messageContent + '\n\n*Please notice that the availabilities will not be updated today, since we are not in a working day.*', { chat_id: chatId, message_id: messageId, parse_mode: 'Markdown' })
 }
 
 const startAutoMessages = () => {
